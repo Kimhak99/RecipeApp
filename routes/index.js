@@ -22,7 +22,7 @@ function routes(app){
          */
 
         res.send("Hello World")
-    }); //get the point? yes
+    }); 
 
     
 }
