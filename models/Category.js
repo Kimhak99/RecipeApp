@@ -6,8 +6,8 @@ const CategorySchema = mongoose.Schema(
             type: String,
             required: true
         },
-        parent: {
-            type: mongoose.Schema.Types.ObjectId,
+        image: {
+            type: String,
             default: null,
             set: v => v || null
         },
@@ -19,7 +19,7 @@ const CategorySchema = mongoose.Schema(
         is_active: {
             type: Boolean,
             default: true,
-            set: v => v || false
+            set: v => v || true
         },
     },
     {
@@ -34,7 +34,7 @@ CategorySchema.methods.fillObject = function() {
     return {
         id: this._id,
         category_name: this.category_name,
-        parent: this.parent,
+        image: this.image,
         remark: this.remark,
         is_active: this.is_active
     }
