@@ -27,6 +27,9 @@ export function getComment(req, res) {
                 console.log("Comment Get Try Error ", err.message);
                 return res.status(200).json({ meta: meta.error.ERROR, message: err.message});
             }
+            if (!data) return res.status(200).json({ meta: meta.error.ERROR, message: msg.record.record_notexist });
+
+            res.status(200).json({ meta: meta.normal.OK, data: await data.fillObject() });
         })
     }
     catch (err) {
