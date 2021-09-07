@@ -1,6 +1,7 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+import serverConfig from "../utils/serverConfig";
 
-const userSchema = mongoose.userSchema({
+const UserSchema = mongoose.Schema({
     firstname: {
         type: String,
         required: true
@@ -26,10 +27,10 @@ const userSchema = mongoose.userSchema({
         type: String,
         required: true
     },
-    profileImage: {
+    profile_image: {
         type: String,
-        default: null,
-        set: v => v || null
+        default: serverConfig.blank_profile,
+        set: v => v || serverConfig.blank_profile,
     }, 
     isAdmin: {
         type: Boolean,
@@ -39,18 +40,18 @@ const userSchema = mongoose.userSchema({
     isActive: {
         type: Boolean,
         default: true,
-        set: v => v || true
+        set: v => v || false
     },
 
 },
 {
-    timestamps = true
+    timestamps : true
 },
 {
     versionKey: false
 });
 
-userSchema.methods.fillObject = function() {
+UserSchema.methods.fillObject = function() {
     return {
         id: this._id,
         firstname: this.firstname,
@@ -58,10 +59,10 @@ userSchema.methods.fillObject = function() {
         username: this.username,
         password: this.password,
         email: this.email,
-        profileImage: this.profileImage,
+        profile_image: this.profile_image,
         isAdmin: this.isAdmin,
         isActive: this.isActive
     }
 }
 
-export default mongoose.model("user", userSchema, "user");
+export default mongoose.model("user", UserSchema);

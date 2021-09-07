@@ -1,19 +1,19 @@
 import mongoose from "mongoose";
 
-const commentSchema = mongoose.commentSchema({
-    commentedBy: {
+const CommentSchema = mongoose.Schema({
+    user_id: {
         type: mongoose.Types.ObjectId,
-        ref: "users",
+        ref: "user",
         required: true
     },
     description: {
         type: String,
         reqired: true
     },
-    isHidden: {
+    isActive: {
         type: Boolean,
-        default: false,
-        set: v => v || false
+        default: true,
+        set: v => v || true
     }
 },
 {
@@ -24,13 +24,13 @@ const commentSchema = mongoose.commentSchema({
 }
 );
 
-commentSchema.methods.fillObject = function () {
+CommentSchema.methods.fillObject = function () {
     return {
         id: this._id,
-        commentedBy: this.,
+        commentedBy: await this.user_id.fillObject(),
         description: this.description,
-        isHidden: this.isHidden
+        isActive: this.isActive
     }
 }
 
-export default mongoose.model("comments", commentSchema);
+export default mongoose.model("comment", CommentSchema);

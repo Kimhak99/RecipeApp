@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import serverConfig from "../utils/serverConfig";
 
 const CategorySchema = mongoose.Schema(
     {
@@ -8,8 +9,8 @@ const CategorySchema = mongoose.Schema(
         },
         image: {
             type: String,
-            default: null,
-            set: v => v || null
+            default: serverConfig.blank_profile,
+            set: v => v || serverConfig.blank_profile,
         },
         remark: {
             type: String,

@@ -13,7 +13,6 @@ mongoose.connect(serverConfig.db_connection, { useNewUrlParser: true, useUnified
 
     console.log("DB connected");
 
-    //missing package
     app.use(methodOverride('_method')); //wat is it for, by deafult https only support get and post, sometime, we need to use put, patch option ettc...., this makes sure that
     // others support the methods
     app.use(cors());
