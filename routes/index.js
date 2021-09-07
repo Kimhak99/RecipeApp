@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import userRouter from "./user";
+import commentRouter from "./comment";
 
 function routes(app){
     //dont have any route
@@ -26,6 +27,7 @@ function routes(app){
     // }); 
 
     app.use("/user", userRouter);
+    app.use("/comment", commentRouter);
 }
 
 export default routes;

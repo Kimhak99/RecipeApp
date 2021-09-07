@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import serverConfig from "../utils/serverConfig";
 
 const UserSchema = mongoose.Schema({
     firstname: {
@@ -29,15 +28,15 @@ const UserSchema = mongoose.Schema({
     },
     profile_image: {
         type: String,
-        default: serverConfig.blank_profile,
-        set: v => v || serverConfig.blank_profile,
+        default: "",
+        set: v => v || "",
     }, 
-    isAdmin: {
+    is_admin: {
         type: Boolean,
         default: false,
         set: v => v || false
     },
-    isActive: {
+    is_active: {
         type: Boolean,
         default: true,
         set: v => v || false
@@ -60,8 +59,8 @@ UserSchema.methods.fillObject = function() {
         password: this.password,
         email: this.email,
         profile_image: this.profile_image,
-        isAdmin: this.isAdmin,
-        isActive: this.isActive
+        is_admin: this.is_admin,
+        is_active: this.is_active
     }
 }
 

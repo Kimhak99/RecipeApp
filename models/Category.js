@@ -9,8 +9,8 @@ const CategorySchema = mongoose.Schema(
         },
         image: {
             type: String,
-            default: serverConfig.blank_profile,
-            set: v => v || serverConfig.blank_profile,
+            default: "",
+            set: v => v || "",
         },
         remark: {
             type: String,
