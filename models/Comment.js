@@ -13,7 +13,7 @@ const CommentSchema = mongoose.Schema({
     is_active: {
         type: Boolean,
         default: true,
-        set: v => v || true
+        set: v => v || false
     }
 },
 {
@@ -29,7 +29,7 @@ CommentSchema.methods.fillObject = async function () {
         id: this._id,
         user_id: await this.user_id.fillObject(),
         description: this.description,
-        is_active: this.isActive
+        is_active: this.is_active
     }
 }
 

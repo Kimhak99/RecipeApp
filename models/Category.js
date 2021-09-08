@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import serverConfig from "../utils/serverConfig";
 
 const CategorySchema = mongoose.Schema(
     {
@@ -20,11 +19,11 @@ const CategorySchema = mongoose.Schema(
         is_active: {
             type: Boolean,
             default: true,
-            set: v => v || true
+            set: v => v || false
         },
     },
     {
-        timestamps = true
+        timestamps : true
     },
     {
         versionKey: false

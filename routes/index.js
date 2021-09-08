@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import userRouter from "./user";
 import commentRouter from "./comment";
+import categoryRouter from "./category";
+import recipeRouter from "./recipe";
 
 function routes(app){
     //dont have any route
@@ -28,6 +30,8 @@ function routes(app){
 
     app.use("/user", userRouter);
     app.use("/comment", commentRouter);
+    app.use("/category", categoryRouter);
+    app.use("/recipe", recipeRouter);
 }
 
 export default routes;
