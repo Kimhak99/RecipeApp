@@ -3,6 +3,7 @@ import userRouter from "./user";
 import commentRouter from "./comment";
 import categoryRouter from "./category";
 import recipeRouter from "./recipe";
+import authorizationRouter from "./authorization";
 
 function routes(app){
     //dont have any route
@@ -32,6 +33,7 @@ function routes(app){
     app.use("/comment", commentRouter);
     app.use("/category", categoryRouter);
     app.use("/recipe", recipeRouter);
+    app.use("", authorizationRouter);
 }
 
 export default routes;
