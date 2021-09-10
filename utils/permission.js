@@ -29,10 +29,5 @@ export async function hashPwd(pwd) {
 }
 
 export function validatePwd(pwd, dbPwd) {
-    // return bcrypt.compare(pwd, dbPwd);
-    if(pwd === dbPwd) {
-        return true;
-    }else {
-        return false;
-    }
+    return bcrypt.compare(pwd, dbPwd);
 }
