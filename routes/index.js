@@ -4,6 +4,7 @@ import commentRouter from "./comment";
 import categoryRouter from "./category";
 import recipeRouter from "./recipe";
 import authorizationRouter from "./authorization";
+import { verifyToken } from "../utils/permission";
 
 function routes(app){
     //dont have any route
@@ -31,7 +32,7 @@ function routes(app){
 
     app.use("/user", userRouter);
     app.use("/comment", commentRouter);
-    app.use("/category", categoryRouter);
+    app.use("/category", verifyToken, categoryRouter);
     app.use("/recipe", recipeRouter);
     app.use("", authorizationRouter);
 }

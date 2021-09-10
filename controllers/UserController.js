@@ -1,6 +1,7 @@
 import User from "../models/User";
 import * as meta from "../utils/enum";
 import * as msg from "../utils/message";
+import { hashPwd} from "../utils/permission";
 
 export function listUser(req, res) {
     try {
@@ -44,7 +45,9 @@ export function getUser(req, res) {
 export async function addUser(req, res) {
     try {
         if(!req.body) return res.status(200).json({ meta: meta.error.MISSING, message: msg.missing_data.user});
-        User(req.body).save()
+        const { password, ...temp } = req.body;
+        const user = new User({ ...temp, password: await hashPwd(password) });
+        user.save()
             .then(() => {
                 res.status(200).json({ meta: meta.normal.OK, message: msg.record.record_added });
             })
