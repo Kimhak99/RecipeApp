@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { array, number } from "prop-types";
+import Comment from "./Comment";
 
 const RecipeSchema = mongoose.Schema({
     recipe_title: {
@@ -7,16 +7,16 @@ const RecipeSchema = mongoose.Schema({
         required: true,
     },
     images: {
-        type: array,
+        type: Array,
         default: [],
         set: v => v || []
     },
     ingredients: {
-        type: array,
+        type: Array,
         required: true
     },
     cooking_steps: {
-        type: array,
+        type: Array,
         required: true
     },
     description: {
@@ -44,13 +44,18 @@ const RecipeSchema = mongoose.Schema({
         default: [],
         set: v => v || []
     },
+    user_id: {
+        type: mongoose.Types.ObjectId,
+        ref: "user",
+        required: true
+    },
     num_of_like: {
-        type: number,
+        type: Number,
         default: 0,
         set: v => v || 0
     },
     num_of_dislike: {
-        type: number,
+        type: Number,
         default: 0,
         set: v => v || 0
     },
@@ -68,9 +73,32 @@ const RecipeSchema = mongoose.Schema({
 }
 );
 
-RecipeSchema.methods.fillObjectRequest = async function () {
+RecipeSchema.methods.fillObject = async function () {
+
+    // const result = orders.map(async (p) => {
+    //     const users = p.userId.map(async (p) => await userSchema.findById(p)); 
+    var { _id, ...comments } = this.comments;
+    comments = await Promise.all(this.comments.map(p => Comment.findById({ _id: p })));
+
+
     return {
         id: this._id,
+        recipe_title: this.recipe_title,
+        images: this.images,
+        ingredients: this.ingredients,
+        cooking_steps: this.cooking_steps,
+        description: this.description,
+        prep_time: this.prep_time,
+        cooking_time: this.cooking_time,
+        category_id: await this.category_id.fillObject(),
+        comments: { id: _id, ...comments },
+        user_id: await this.user_id.fillObject(),
+        num_of_like: this.num_of_like,
+        num_of_dislike: this.num_of_dislike,
+        is_active: this.is_active
+
 
     }
 }
+
+export default mongoose.model("recipe", RecipeSchema);

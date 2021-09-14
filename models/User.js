@@ -1,6 +1,6 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-const userSchema = mongoose.userSchema({
+const UserSchema = mongoose.Schema({
     firstname: {
         type: String,
         required: true
@@ -26,31 +26,31 @@ const userSchema = mongoose.userSchema({
         type: String,
         required: true
     },
-    profileImage: {
+    profile_image: {
         type: String,
-        default: null,
-        set: v => v || null
+        default: "",
+        set: v => v || "",
     }, 
-    isAdmin: {
+    is_admin: {
         type: Boolean,
         default: false,
         set: v => v || false
     },
-    isActive: {
+    is_active: {
         type: Boolean,
         default: true,
-        set: v => v || true
+        set: v => v || false
     },
 
 },
 {
-    timestamps = true
+    timestamps : true
 },
 {
     versionKey: false
 });
 
-userSchema.methods.fillObject = function() {
+UserSchema.methods.fillObject = function() {
     return {
         id: this._id,
         firstname: this.firstname,
@@ -58,10 +58,10 @@ userSchema.methods.fillObject = function() {
         username: this.username,
         password: this.password,
         email: this.email,
-        profileImage: this.profileImage,
-        isAdmin: this.isAdmin,
-        isActive: this.isActive
+        profile_image: this.profile_image,
+        is_admin: this.is_admin,
+        is_active: this.is_active
     }
 }
 
-export default mongoose.model("user", userSchema, "user");
+export default mongoose.model("user", UserSchema);

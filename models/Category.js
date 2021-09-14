@@ -8,8 +8,8 @@ const CategorySchema = mongoose.Schema(
         },
         image: {
             type: String,
-            default: null,
-            set: v => v || null
+            default: "",
+            set: v => v || "",
         },
         remark: {
             type: String,
@@ -19,11 +19,11 @@ const CategorySchema = mongoose.Schema(
         is_active: {
             type: Boolean,
             default: true,
-            set: v => v || true
+            set: v => v || false
         },
     },
     {
-        timestamps = true
+        timestamps : true
     },
     {
         versionKey: false
