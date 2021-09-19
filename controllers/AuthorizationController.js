@@ -8,12 +8,16 @@ import { hashPwd, validatePwd } from "../utils/permission";
 export async function login(req, res) {
     try {
         const user = await User.findOne({ username: req.body.username });
+        console.log(user, req.body);
+        console.log(await hashPwd("admin123"));
 
         if (user) {
             const checkPwd = await validatePwd(req.body.password, user.password);
             console.log(req.body.password);
             console.log(user.password);
             if(checkPwd) {
+                //u have whoever request their own info embeded inside token already, so no need to send anymore just reuse it
+                //u didnt put any role, should I?u can just pass id and then find  by id to get whatevr info u need ok
                 jwt.sign({ id: user._id, username: user.username, firstname: user.firstname, lastname: user.lastname, email: user.email }, process.env.TOKEN, {expiresIn: '10d'}, (err, token) => {
                     if (err) {
                         console.log("Log in Try Error ", err.message);
