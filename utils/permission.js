@@ -14,7 +14,8 @@ export function verifyToken(req, res, next) {
                 return res.status(200).send({ meta: meta.error.TOKENEXPIRE, message: msg.error_msg.token_expired });
             }
 
-            req.user = decoded.data;
+            req.user = decoded;
+            //decoded.data contains info we sign as payload when generate token
 
             next();
         });
