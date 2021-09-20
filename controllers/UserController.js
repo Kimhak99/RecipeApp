@@ -3,9 +3,25 @@ import * as meta from "../utils/enum";
 import * as msg from "../utils/message";
 import { hashPwd} from "../utils/permission";
 
-export function listUser(req, res) {
+export async function listUser(req, res) {
     try {
-        User.find({ is_active: true }).exec((err, datas) => {
+        const search = req.body;
+        let users, totalCount, result = [];
+    
+        search.limit === undefined || search.limit === 0 ? search.limit = 0 : search.limit;
+        search.keyword === undefined || search.keyword === null ? search.keyword = "" : search.keyword;
+    
+        if(search.keyword != "") {
+           await User.find({
+              $or: [
+                {username: { $regex: search.keyword, $options: 'i'}},
+                {email: { $regex: search.keyword, $options: 'i'}}
+              ]
+            }).limit(search.limit).skip(0);
+            // totalCount = await (await User.find()).length;
+      } 
+      else {
+        await User.find({ is_active: true }).limit(search.limit).skip(search.skip).exec((err, datas) => {
             if(err) {
                 console.log("User List Try Error ", err.message);
                 return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
@@ -14,8 +30,10 @@ export function listUser(req, res) {
             datas = datas.map(p => p.fillObject());
 
             res.status(200).json({ meta: meta.normal.OK, data: datas });
-        })
+            })
+        }
     }
+
     catch (err) {
         console.log("User List Error", err.message);
         res.status(500).json({ meta: meta.internal_error.ERROR, message: err.message });
