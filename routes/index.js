@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
 import userRouter from "./user";
 import commentRouter from "./comment";
 import categoryRouter from "./category";
+import uploadRouter from "./upload";
 import recipeRouter from "./recipe";
 import authorizationRouter from "./authorization";
 import { verifyToken } from "../utils/permission";
@@ -35,6 +35,7 @@ function routes(app){
     app.use("/category", verifyToken, categoryRouter);
     app.use("/recipe", recipeRouter);
     app.use("", authorizationRouter);
+    app.use("/", uploadRouter);
 }
 
 export default routes;
