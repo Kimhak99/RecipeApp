@@ -1,20 +1,57 @@
 import User from "../models/User";
 import * as meta from "../utils/enum";
 import * as msg from "../utils/message";
-import { hashPwd} from "../utils/permission";
+import { hashPwd } from "../utils/permission";
 
-export function listUser(req, res) {
+export  function listUser(req, res) {
     try {
-        User.find({ is_active: true }).exec((err, datas) => {
-            if(err) {
-                console.log("User List Try Error ", err.message);
-                return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
-            }
+        const search = req.body;
+        let user, totalCount, result = [];
 
-            datas = datas.map(p => p.fillObject());
+        search.limit === undefined || search.limit === 0 ? search.limit = 0 : search.limit;
+        search.keyword === undefined || search.keyword === null ? search.keyword = "" : search.keyword;
+        
+        // lim teachhay, so split the string by checking middle space
+        const name = search.keyword.split(" ");
+    
+        if (search.keyword != "") {
+             User.find({
+                is_active: true,
+                $or: [
+                    { firstname: { $regex: search.keyword, $options: 'i' } },
+                    { lastname: { $regex: search.keyword, $options: 'i' } },
+                    { username: { $regex: search.keyword, $options: 'i' } },
+                    {
+                        $and: [
+                            {lastname: { $regex: name[0], $options: 'i' } },
+                            {firstname: { $regex: name[1], $options: 'i' } },
+                        ]
+                    }
+                ]
+            }).limit(search.limit).skip(0).exec((err, datas) => {
+                if (err) {
+                    console.log("User List Try Error ", err.message);
+                    return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
+                }
 
-            res.status(200).json({ meta: meta.normal.OK, data: datas });
-        })
+                datas = datas.map(p => p.fillObject());
+
+                res.status(200).json({ meta: meta.normal.OK, data: datas });
+            })
+            //missing callback function// ok thank u :)
+        }
+        else {
+              User.find({ is_active: true }).limit(search.limit).skip(search.skip).exec((err, datas) => {
+                if (err) {
+                    console.log("User List Try Error ", err.message);
+                    return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
+                }
+
+                datas = datas.map(p => p.fillObject());
+
+                res.status(200).json({ meta: meta.normal.OK, data: datas });
+            })
+        }
     }
     catch (err) {
         console.log("User List Error", err.message);
@@ -26,13 +63,13 @@ export function listUser(req, res) {
 export function getUser(req, res) {
     try {
         User.findById(req.params.id).exec((err, data) => {
-            if(err) {
+            if (err) {
                 console.log("User Get Try Error ", err.message);
                 return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
             }
 
-            if(!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
-            
+            if (!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
+
             res.status(200).json({ meta: meta.normal.OK, data: data.fillObject() });
         })
     }
@@ -44,7 +81,8 @@ export function getUser(req, res) {
 
 export async function addUser(req, res) {
     try {
-        if(!req.body) return res.status(200).json({ meta: meta.error.MISSING, message: msg.missing_data.user});
+        const fullname = req.body.lastname + " " + req.body.firstname;
+        if (!req.body) return res.status(200).json({ meta: meta.error.MISSING, message: msg.missing_data.user });
         const { password, ...temp } = req.body;
         const user = new User({ ...temp, password: await hashPwd(password) });
         user.save()
@@ -64,14 +102,14 @@ export async function addUser(req, res) {
 
 export async function updateUser(req, res) {
     try {
-        if(!req.body.id) return res.status(200).json({ meta: meta.error.MISSING, message: msg.missing_data.id });
+        if (!req.body.id) return res.status(200).json({ meta: meta.error.MISSING, message: msg.missing_data.id });
         User.findByIdAndUpdate(req.body.id, req.body).exec((err, data) => {
-            if(err) {
+            if (err) {
                 console.log("User Update Try Error ", err.message);
                 return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
             }
 
-            if(!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
+            if (!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
 
             res.status(200).json({ meta: meta.normal.OK, message: msg.record.record_updated });
         })
@@ -85,11 +123,11 @@ export async function updateUser(req, res) {
 export function deleteUser(req, res) {
     try {
         User.findByIdAndUpdate(req.params.id, { is_active: false }).exec((err, data) => {
-            if(err) {
+            if (err) {
                 console.log("User Delete Try Error ", err.message);
                 return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
             }
-            if(!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
+            if (!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
             res.status(200).json({ meta: meta.normal.OK, message: msg.record.record_deleted });
         });
     }
@@ -104,7 +142,7 @@ export async function getUserInfo(req, res) {
     try {
         res.status(200).json({ user_info: await User.findById(req.user.id) }); //can i change this back?back to what? req.body, incorrect? it's a get method, u cant access body, plus 
         //u didnt send anything along from frontend 
-        
+
     }
     catch (err) {
         res.status(500).json({ meta: meta.ERROR, message: err.message });
