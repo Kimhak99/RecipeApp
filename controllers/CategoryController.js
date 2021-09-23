@@ -4,15 +4,38 @@ import * as meta from "../utils/enum";
 
 export function listCategory(req, res) {
     try {
-        Category.find({ is_active: true }).exec((err, datas) => {
-            if(err) {
-                console.log("List Category Try Error ", err.message);
-                return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
-            }
+        const search = req.body;
 
-            datas = datas.map(p => p.fillObject());
-            res.status(200).json({ meta: meta.normal.OK, data: datas });
-        })
+        search.limit === undefined || search.limit === 0 ? search.limit = 0 : search.limit;
+        search.keyword === undefined || search.keyword === null? search.keyword = "" : search.keyword;
+
+        if(search.keyword != "") {
+            Category.find({
+                is_active: true,
+                $where: [
+                    {category_name: {$regex: search.keyword, $options: 'i'}}
+                ]
+            }).limit(search.limit).skip(0).exec((err, datas) => {
+                if(err) {
+                    console.log("List Category Try Error ", err.message);
+                    return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
+                }
+    
+                datas = datas.map(p => p.fillObject());
+                res.status(200).json({ meta: meta.normal.OK, data: datas });
+            })
+        }
+        else {
+            Category.find({ is_active: true }).exec((err, datas) => {
+                if(err) {
+                    console.log("List Category Try Error ", err.message);
+                    return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
+                }
+    
+                datas = datas.map(p => p.fillObject());
+                res.status(200).json({ meta: meta.normal.OK, data: datas });
+            })
+        }      
     }
     catch(err) {
         console.log("Category List Error ", err.message);

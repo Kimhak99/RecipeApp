@@ -3,10 +3,9 @@ import * as meta from "../utils/enum";
 import * as msg from "../utils/message";
 import { hashPwd } from "../utils/permission";
 
-export  function listUser(req, res) {
+export function listUser(req, res) {
     try {
         const search = req.body;
-        let user, totalCount, result = [];
 
         search.limit === undefined || search.limit === 0 ? search.limit = 0 : search.limit;
         search.keyword === undefined || search.keyword === null ? search.keyword = "" : search.keyword;
