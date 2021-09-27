@@ -20,7 +20,7 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
 
-    }, 
+    },
 
     email: {
         type: String,
@@ -30,7 +30,7 @@ const UserSchema = mongoose.Schema({
         type: String,
         default: "",
         set: v => v || "",
-    }, 
+    },
     is_admin: {
         type: Boolean,
         default: false,
@@ -43,14 +43,14 @@ const UserSchema = mongoose.Schema({
     },
 
 },
-{
-    timestamps : true
-},
-{
-    versionKey: false
-});
+    {
+        timestamps: true
+    },
+    {
+        versionKey: false
+    });
 
-UserSchema.methods.fillObject = function() {
+UserSchema.methods.fillObject = function () {
     return {
         id: this._id,
         firstname: this.firstname,

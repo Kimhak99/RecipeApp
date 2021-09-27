@@ -3,8 +3,10 @@ import * as meta from "../utils/enum.js";
 import * as msg from "../utils/message.js";
 
 export async function upload(req, res) {
-  req.file.md5 = req.file.id + req.file.md5;
-  res.status(200).json({ meta: meta.OK, file: req.file });
+  // req.file.md5 = req.file.id + req.file.md5;
+  console.log(req.file);
+
+  res.status(200).json({ file: req.file });
 }
 
 export async function uploads(req, res) {
@@ -77,14 +79,18 @@ export async function deleteFileInternal(fileMd5) {
 
 export async function getFile(req, res) {
   try {
-    const id = mongoose.Types.ObjectId(req.params.md5.substring(0, 24));
-    const md5 = req.params.md5.substring(24, req.params.md5.length);
-    global.myGFS.files.findOne({ _id: id, md5: md5 }, (err, file) => {
+    // const id = mongoose.Types.ObjectId(req.params.md5.substring(0, 24));
+    // const md5 = req.params.md5.substring(24, req.params.md5.length);
+
+    global.myGFS.files.findOne({ filename: req.params.md5 }, (err, file) => {
+      console.log(file);
+
       if (!file || file.length == 0) {
         return res
           .status(404)
           .json({ meta: meta.error.NOTEXIST, message: msg.file_err_msg.notExist });
       }
+
 
       if (file.contentType === "application/pdf") {
         const stream = global.myGFS.createReadStream(file.filename);
@@ -107,7 +113,7 @@ export async function getFile(req, res) {
   } catch (error) {
     res
       .status(500)
-      .json({ meta: meta.internal_error.ERROR, message: msg.messages.ERROR });
+      .json({ meta: meta.internal_error.ERROR, message: "error" });
   }
 
 }

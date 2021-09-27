@@ -3,18 +3,12 @@ import path from "path";
 import crypto from "crypto";
 import mongoose from "mongoose";
 import multer from "multer";
-import {GridFsStorage} from "multer-gridfs-storage";
+import { GridFsStorage } from "multer-gridfs-storage";
 import Grid from "gridfs-stream";
 import "dotenv/config";
 import { verifyToken } from "../utils/permission.js";
 import { getFile, uploads, deleteFile, getFileObj, upload as singleUpload } from "../controllers/UploadController.js";
 import serverConfig from "../utils/serverConfig.js";
-
-const router = express.Router();
-const collectionName = "files";
-const conn = mongoose.createConnection(serverConfig.db_connection, { useNewUrlParser: true, useUnifiedTopology: true });
-
-let gfs;
 
 function checkFileType(data) {
     const fileType = ["image/jpeg", "image/png", "application/pdf"];
@@ -29,6 +23,12 @@ function checkFileType(data) {
         return !fileType.includes(data.mimetype);
     }
 };
+
+const router = express.Router();
+const collectionName = "files";
+const conn = mongoose.createConnection(serverConfig.db_connection, { useNewUrlParser: true, useUnifiedTopology: true });
+
+let gfs;
 
 conn.once('open', () => {
     gfs = Grid(conn.db, mongoose.mongo);
@@ -69,7 +69,7 @@ const upload = multer({ storage });
 
 //File Handling
 //Upload One file
-router.post("/upload", verifyToken, upload.single("file"), singleUpload);
+router.post("/upload", upload.single("file"), singleUpload);
 
 //Upload Multiple files
 router.post("/uploads", verifyToken, upload.array("file"), uploads);

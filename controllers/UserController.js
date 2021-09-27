@@ -9,12 +9,12 @@ export function listUser(req, res) {
 
         search.limit === undefined || search.limit === 0 ? search.limit = 0 : search.limit;
         search.keyword === undefined || search.keyword === null ? search.keyword = "" : search.keyword;
-        
+
         // lim teachhay, so split the string by checking middle space
         const name = search.keyword.split(" ");
-    
+
         if (search.keyword != "") {
-             User.find({
+            User.find({
                 is_active: true,
                 $or: [
                     { firstname: { $regex: search.keyword, $options: 'i' } },
@@ -22,8 +22,8 @@ export function listUser(req, res) {
                     { username: { $regex: search.keyword, $options: 'i' } },
                     {
                         $and: [
-                            {lastname: { $regex: name[0], $options: 'i' } },
-                            {firstname: { $regex: name[1], $options: 'i' } },
+                            { lastname: { $regex: name[0], $options: 'i' } },
+                            { firstname: { $regex: name[1], $options: 'i' } },
                         ]
                     }
                 ]
@@ -40,7 +40,7 @@ export function listUser(req, res) {
             //missing callback function// ok thank u :)
         }
         else {
-              User.find({ is_active: true }).limit(search.limit).skip(search.skip).exec((err, datas) => {
+            User.find({ is_active: true }).limit(search.limit).skip(search.skip).exec((err, datas) => {
                 if (err) {
                     console.log("User List Try Error ", err.message);
                     return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
@@ -102,6 +102,7 @@ export async function addUser(req, res) {
 export async function updateUser(req, res) {
     try {
         if (!req.body.id) return res.status(200).json({ meta: meta.error.MISSING, message: msg.missing_data.id });
+
         User.findByIdAndUpdate(req.body.id, req.body).exec((err, data) => {
             if (err) {
                 console.log("User Update Try Error ", err.message);
@@ -109,6 +110,8 @@ export async function updateUser(req, res) {
             }
 
             if (!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
+
+            console.log(data);
 
             res.status(200).json({ meta: meta.normal.OK, message: msg.record.record_updated });
         })
