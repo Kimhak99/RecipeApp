@@ -1,7 +1,7 @@
 import { collectionName, gfs, gridFSBucket } from "../utils/upload";
 
 const UploadFile = async (req, res) => {
-  res.status(201).send({ meta: 201, file: req.file });
+  res.status(201).send({ meta: 201, file: req.file || req.files });
 };
 
 const GetFile = async (req, res) => {

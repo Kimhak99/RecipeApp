@@ -35,11 +35,11 @@ const storage = new GridFsStorage({
     url: serverConfig.db_connection,
     options: { useUnifiedTopology: true },
     file: (_, file) => {
-        return new Promise((resolve, __) => {
-            if (checkFileType(file)) throw new ApiError(httpStatus.BAD_REQUEST, "Wrong file type(s)");
+        return new Promise((resolve, reject) => {
+            if (checkFileType(file)) return reject({ meta: 403, message: "Wrong file type(s)" });
 
             crypto.randomBytes(16, (err, buf) => {
-                if (err) throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, err.message);
+                if (err) return reject({ meta: 500, message: err.message });
 
                 const filename = buf.toString('hex') + path.extname(file.originalname);
                 const fileInfo = {
