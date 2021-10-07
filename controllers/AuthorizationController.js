@@ -8,7 +8,6 @@ import { hashPwd, validatePwd } from "../utils/permission";
 export async function login(req, res) {
     try {
         const user = await User.findOne({ username: req.body.username });
-        console.log(req.body);
 
         if (user) {
             const checkPwd = await validatePwd(req.body.password, user.password);
@@ -18,8 +17,8 @@ export async function login(req, res) {
                 //u didnt put any role, should I?u can just pass id and then find  by id to get whatevr info u need ok
                 jwt.sign({ id: user._id, username: user.username, firstname: user.firstname, lastname: user.lastname, email: user.email }, process.env.TOKEN, { expiresIn: '10d' }, (err, token) => {
                     if (err) {
-                        console.log("Log in Try Error ", err.message);
-                        return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
+                        console.log("Log in Try Error ", err);
+                        return res.status(200).json({ meta: meta.error.ERROR, message: err });
                     }
                     res.status(200).json({ meta: meta.normal.OK, data: token });
                 })
@@ -34,8 +33,8 @@ export async function login(req, res) {
 
     }
     catch (err) {
-        console.log("Login Error ", err.message);
-        res.status(500).json({ meta: meta.internal_error.ERROR, message: msg.err.message });
+        console.log("Login Error ", err);
+        res.status(500).json({ meta: meta.internal_error.ERROR, message: err });
     }
 }
 
