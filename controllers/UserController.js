@@ -37,7 +37,6 @@ export function listUser(req, res) {
 
                 res.status(200).json({ meta: meta.normal.OK, data: datas });
             })
-            //missing callback function// ok thank u :)
         }
         else {
             User.find({ is_active: true }).limit(search.limit).skip(search.skip).exec((err, datas) => {
