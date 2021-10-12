@@ -65,7 +65,7 @@ export async function listRecipeCategory(req, res) {
   try {
     const category = await Category.findById(req.params.category_id);
 
-    Recipe.find({ is_active: true})
+    Recipe.find({ is_active: true, category_id: category._id })
       .populate("category_id")
       .populate("user_id")
       .exec(async (err, datas) => {
