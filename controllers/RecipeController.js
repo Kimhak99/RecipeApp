@@ -2,6 +2,51 @@ import Recipe from "../models/Recipe";
 import * as meta from "../utils/enum";
 import * as msg from "../utils/message";
 
+export async function listRecipeV2(req, res) {
+  try {
+    const body = req.body;
+    const filter = { is_active: true };
+    let recipes;
+
+    //firstly, u cant search like this directly, it wont know what "category i", id only
+    // this one for click category, second, u need check condition since  only one can be toggled at a time
+
+    //type 0 - search bar, type 1 category list
+    if (body.type == 0) {
+      if (body.keyword) filter.recipe_title = { $regex: body.keyword, $options: "i" };
+      /**
+       * all search must find by .keyword 
+       * 1. find category by name (select exact name, ex: "japan" = true, "jp" = false, true only if category name is "jp". "cate A", "cate B", user search -> "cate", both false)
+       * 2. assign result to filter.category_id with id field from result
+       * 3. prevent null or if error happened return from category.find()// 
+       * cate = Category.find()
+       * if(!cat) return  res.status yes...
+       */
+    }
+    else {
+      if (body.category) filter.category_id = body.category;
+    }
+
+
+
+
+    //need more check
+    // if(body.user) filter.recipe_title = { $regex: body.keyword, $options: "i" };
+
+    recipes = await Recipe.find(filter).limit(body.limit).skip(0).populate("category_id user_id");
+
+    if (!recipes) return res.status(500).send({ meta: 500, message: "internal server error" });
+
+    recipes = await Promise.all(recipes.map(item => item.fillObject()));
+
+    res.status(200).send({ meta: 200, datas: recipes });
+  }
+  catch (err) {
+
+  }
+}
+
+//it's magic time, done yay :D
 export async function listRecipe(req, res) {
   try {
     const search = req.body;
