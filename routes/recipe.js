@@ -4,7 +4,6 @@ import * as recipe from "../controllers/RecipeController";
 const recipeRouter = express.Router();
 
 recipeRouter.post("/list", recipe.listRecipe);
-recipeRouter.post("/listRecipeCategory", recipe.listRecipeCategory);
 recipeRouter.get("/get/:id", recipe.getRecipe);
 recipeRouter.post("/create", recipe.addRecipe);
 recipeRouter.post("/update", recipe.updateRecipe);

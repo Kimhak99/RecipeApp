@@ -1,5 +1,4 @@
 import Recipe from "../models/Recipe";
-import Category from "../models/Category";
 import * as meta from "../utils/enum";
 import * as msg from "../utils/message";
 
@@ -41,6 +40,8 @@ export async function listRecipe(req, res) {
       Recipe.find({ is_active: true })
         .populate("category_id")
         .populate("user_id")
+        .limit(search.limit)
+        .skip(search.skip)
         .exec(async (err, datas) => {
           if (err) {
             console.log("Recipe List Try Error", err.message);
@@ -61,32 +62,6 @@ export async function listRecipe(req, res) {
   }
 }
 
-export async function listRecipeCategory(req, res) {
-  try {
-    const category = await Category.findById(req.params.category_id);
-
-    Recipe.find({ is_active: true, category_id: category._id })
-      .populate("category_id")
-      .populate("user_id")
-      .exec(async (err, datas) => {
-        if (err) {
-          console.log("Recipe Category List Try Error", err.message);
-          return res
-            .status(200)
-            .json({ meta: meta.error.ERROR, message: err.message });
-        }
-
-        datas = await Promise.all(datas.map((p) => p.fillObject()));
-        res.status(200).json({ meta: meta.normal.OK, datas: datas });
-      });
-  } catch (err) {
-    console.log("Recipe Category List Error", err.message);
-    res
-      .status(500)
-      .json({ meta: meta.internal_error.ERROR, message: err.message });
-  }
-}
-
 export function getRecipe(req, res) {
   try {
     Recipe.findById(req.params.id).exec(async (err, data) => {
@@ -98,12 +73,10 @@ export function getRecipe(req, res) {
       }
 
       if (!data)
-        return res
-          .status(200)
-          .json({
-            meta: meta.error.NOTEXIST,
-            message: msg.record.record_notexist,
-          });
+        return res.status(200).json({
+          meta: meta.error.NOTEXIST,
+          message: msg.record.record_notexist,
+        });
 
       res
         .status(200)
@@ -158,12 +131,10 @@ export function updateRecipe(req, res) {
       }
 
       if (!data)
-        return res
-          .status(200)
-          .json({
-            meta: meta.error.NOTEXIST,
-            message: msg.record.record_notexist,
-          });
+        return res.status(200).json({
+          meta: meta.error.NOTEXIST,
+          message: msg.record.record_notexist,
+        });
       res
         .status(200)
         .json({ meta: meta.normal.OK, message: msg.record.record_updated });
