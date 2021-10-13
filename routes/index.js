@@ -9,7 +9,7 @@ import uploadRouter from "./upload.route";
 function routes(app) {
     app.use("/user", userRouter);
     app.use("/comment", commentRouter);
-    app.use("/category", verifyToken, categoryRouter);
+    app.use("/category", categoryRouter);
     app.use("/recipe", recipeRouter);
     app.use("", authorizationRouter);
     app.use("/", uploadRouter);
