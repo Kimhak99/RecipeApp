@@ -1,7 +1,7 @@
 import Recipe from "../models/Recipe";
+import Category from "../models/Category";
 import * as meta from "../utils/enum";
 import * as msg from "../utils/message";
-
 export async function listRecipeV2(req, res) {
   try {
     const body = req.body;
@@ -12,38 +12,52 @@ export async function listRecipeV2(req, res) {
     // this one for click category, second, u need check condition since  only one can be toggled at a time
 
     //type 0 - search bar, type 1 category list
-    if (body.type == 0) {
-      if (body.keyword) filter.recipe_title = { $regex: body.keyword, $options: "i" };
+
+    const category = await Category.find({ category_name: body.keyword });
+    if (!category)
+      return res.status(500).send({ meta: 500, message: "internal server error" });
+
+    console.log("expect name: ", category.category_name); //Undefined
+
+    // if (body.type == 0) {
+      if (body.keyword) {
+        filter.recipe_title = { $regex: body.keyword, $options: "i" };
+      // }
+      if (body.keyword == category.category_name) {
+        const result = await Recipe.find({ category_id: "category._id" });
+
+        console.log("expect category id: ", result);
+        filter.category_id = { $regex: result, $options: "i" };
+      }
       /**
-       * all search must find by .keyword 
+       * all search must find by .keyword
        * 1. find category by name (select exact name, ex: "japan" = true, "jp" = false, true only if category name is "jp". "cate A", "cate B", user search -> "cate", both false)
        * 2. assign result to filter.category_id with id field from result
-       * 3. prevent null or if error happened return from category.find()// 
+       * 3. prevent null or if error happened return from category.find()//
        * cate = Category.find()
        * if(!cat) return  res.status yes...
        */
-    }
-    else {
+    } else {
       if (body.category) filter.category_id = body.category;
     }
-
-
-
 
     //need more check
     // if(body.user) filter.recipe_title = { $regex: body.keyword, $options: "i" };
 
-    recipes = await Recipe.find(filter).limit(body.limit).skip(0).populate("category_id user_id");
+    recipes = await Recipe.find(filter)
+      .limit(body.limit)
+      .skip(0)
+      .populate("category_id user_id");
 
-    if (!recipes) return res.status(500).send({ meta: 500, message: "internal server error" });
+    if (!recipes)
+      return res
+        .status(500)
+        .send({ meta: 500, message: "internal server error" });
 
-    recipes = await Promise.all(recipes.map(item => item.fillObject()));
+    recipes = await Promise.all(recipes.map((item) => item.fillObject()));
 
     res.status(200).send({ meta: 200, datas: recipes });
-  }
-  catch (err) {
-
-  }
+  } catch (err) {}
 }
 
 //it's magic time, done yay :D
