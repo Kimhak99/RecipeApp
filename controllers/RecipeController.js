@@ -8,36 +8,31 @@ export async function listRecipeV2(req, res) {
     const filter = { is_active: true };
     let recipes;
 
-    //firstly, u cant search like this directly, it wont know what "category i", id only
-    // this one for click category, second, u need check condition since  only one can be toggled at a time
+     /**
+     * all search must find by .keyword
+     * 1. find category by name (select exact name, ex: "japan" = true, "jp" = false, true only if category name is "jp". "cate A", "cate B", user search -> "cate", both false)
+     * 2. assign result to filter.category_id with id field from result
+     * 3. prevent null or if error happened return from category.find()//
+     * cate = Category.find()
+     * if(!cat) return  res.status yes...
+     */
 
     //type 0 - search bar, type 1 category list
-
-    const category = await Category.find({ category_name: body.keyword });
-    if (!category)
-      return res.status(500).send({ meta: 500, message: "internal server error" });
-
-    console.log("expect name: ", category.category_name); //Undefined
+      let category = await Category.find({ category_name: body.keyword });
+      if (!category)
+        return res.status(500).send({ meta: 500, message: "internal server error" });
+        
+        console.log("expect name: ", category[0].category_name);
 
     // if (body.type == 0) {
-      if (body.keyword) {
+    if (body.keyword && body.keyword != category[0].category_name) {
         filter.recipe_title = { $regex: body.keyword, $options: "i" };
-      // }
-      if (body.keyword == category.category_name) {
-        const result = await Recipe.find({ category_id: "category._id" });
-
-        console.log("expect category id: ", result);
-        filter.category_id = { $regex: result, $options: "i" };
-      }
-      /**
-       * all search must find by .keyword
-       * 1. find category by name (select exact name, ex: "japan" = true, "jp" = false, true only if category name is "jp". "cate A", "cate B", user search -> "cate", both false)
-       * 2. assign result to filter.category_id with id field from result
-       * 3. prevent null or if error happened return from category.find()//
-       * cate = Category.find()
-       * if(!cat) return  res.status yes...
-       */
+    }
+    if (body.keyword == category[0].category_name) {
+      console.log("search for category: ", body.keyword);
+      filter.category_id = { $regex: body.keyword, $options: "i" };
     } else {
+   
       if (body.category) filter.category_id = body.category;
     }
 
