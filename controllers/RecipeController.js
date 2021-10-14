@@ -18,21 +18,14 @@ export async function listRecipeV2(req, res) {
      */
 
     //type 0 - search bar, type 1 category list
-      let category = await Category.find({ category_name: body.keyword });
-      if (!category)
-        return res.status(500).send({ meta: 500, message: "internal server error" });
-        
-        console.log("expect name: ", category[0].category_name);
-
-    // if (body.type == 0) {
-    if (body.keyword && body.keyword != category[0].category_name) {
-        filter.recipe_title = { $regex: body.keyword, $options: "i" };
+    if (body.type == 0) {
+      let category = await Category.findOne({ category_name: { $regex: body.keyword, $options: "i" } });
+      
+      if(category || body.keyword) filter = {...filter, $or: []};
+      if(category) filter["$or"].push({ category_id: category._id });
+      if(body.keyword) filter["$or"].push({ recipe_title: { $regex: body.keyword, $options: "i" }})
     }
-    if (body.keyword == category[0].category_name) {
-      console.log("search for category: ", body.keyword);
-      filter.category_id = { $regex: body.keyword, $options: "i" };
-    } else {
-   
+    else if(body.type == 1) {
       if (body.category) filter.category_id = body.category;
     }
 
