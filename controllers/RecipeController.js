@@ -45,7 +45,12 @@ export async function listRecipeV2(req, res) {
     recipes = await Promise.all(recipes.map((item) => item.fillObject()));
 
     res.status(200).send({ meta: 200, datas: recipes });
-  } catch (err) {}
+  } catch (err) {
+    console.log("Recipe List Error", err.message);
+    res
+      .status(500)
+      .json({ meta: meta.internal_error.ERROR, message: err.message });
+  }
 }
 
 //it's magic time, done yay :D
