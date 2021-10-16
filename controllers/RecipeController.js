@@ -5,7 +5,7 @@ import * as msg from "../utils/message";
 export async function listRecipeV2(req, res) {
   try {
     const body = req.body;
-    const filter = { is_active: true };
+    let filter = { is_active: true };
     let recipes;
 
      /**
