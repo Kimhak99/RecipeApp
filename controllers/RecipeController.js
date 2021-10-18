@@ -8,24 +8,24 @@ export async function listRecipeV2(req, res) {
     let filter = { is_active: true };
     let recipes;
 
-     /**
-     * all search must find by .keyword
-     * 1. find category by name (select exact name, ex: "japan" = true, "jp" = false, true only if category name is "jp". "cate A", "cate B", user search -> "cate", both false)
-     * 2. assign result to filter.category_id with id field from result
-     * 3. prevent null or if error happened return from category.find()//
-     * cate = Category.find()
-     * if(!cat) return  res.status yes...
-     */
+    /**
+    * all search must find by .keyword
+    * 1. find category by name (select exact name, ex: "japan" = true, "jp" = false, true only if category name is "jp". "cate A", "cate B", user search -> "cate", both false)
+    * 2. assign result to filter.category_id with id field from result
+    * 3. prevent null or if error happened return from category.find()//
+    * cate = Category.find()
+    * if(!cat) return  res.status yes...
+    */
 
     //type 0 - search bar, type 1 category list
     if (body.type == 0) {
       let category = await Category.findOne({ category_name: { $regex: body.keyword, $options: "i" } });
-      
-      if(category || body.keyword) filter = {...filter, $or: []};
-      if(category) filter["$or"].push({ category_id: category._id });
-      if(body.keyword) filter["$or"].push({ recipe_title: { $regex: body.keyword, $options: "i" }})
+
+      if (category || body.keyword) filter = { ...filter, $or: [] };
+      if (category) filter["$or"].push({ category_id: category._id });
+      if (body.keyword) filter["$or"].push({ recipe_title: { $regex: body.keyword, $options: "i" } })
     }
-    else if(body.type == 1) {
+    else if (body.type == 1) {
       if (body.category) filter.category_id = body.category;
     }
 
@@ -44,7 +44,9 @@ export async function listRecipeV2(req, res) {
 
     recipes = await Promise.all(recipes.map((item) => item.fillObject()));
 
-    res.status(200).send({ meta: 200, datas: recipes });
+    //part of it is my bad. xd. i didnt use the meta thing, i used 200 directly, while
+    // u check for 2001 lol... well, my bad...
+    res.status(200).send({ meta: meta.normal.OK, datas: recipes });
   } catch (err) {
     console.log("Recipe List Error", err.message);
     res
