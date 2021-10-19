@@ -25,14 +25,14 @@ const RecipeSchema = mongoose.Schema({
         set: v => v || ""
     },
     prep_time: {
-        type: String,
-        default: "",
-        set: v => v || ""
+        type: Number,
+        default: 0,
+        set: v => v || 0
     },
     cooking_time: {
-        type: String,
-        default: "",
-        set: v => v || ""
+        type: Number,
+        default: 0,
+        set: v => v || 0
     },
     category_id: {
         type: mongoose.Types.ObjectId,
