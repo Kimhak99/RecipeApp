@@ -41,6 +41,7 @@ export async function login(req, res) {
 export async function register(req, res) {
     try {
         const { password, ...temp } = req.body;
+
         const user = new User({ ...temp, password: await hashPwd(password) });
         user.save()
             .then(data => {
@@ -50,6 +51,41 @@ export async function register(req, res) {
                 console.log("register Try Error ", err.message);
                 res.status(200).json({ meta: meta.error.ERROR, message: err.message })
             })
+
+    }
+    catch (err) {
+        console.log("Register Error ", err.message);
+        res.status(500).json({ meta: meta.internal_error.ERROR, message: err.message });
+    }
+}
+export async function resetPassword(req, res) {
+    try {
+        // const tempt = {
+        //     password: "",
+        //     new_password: "",
+        //     // confirm_password: "",
+        // }
+        // User.findById(id);
+
+        User.findOneAndUpdate({ password: req.body.password }, { password: await hashPwd(req.body.new_password) }).exec((err, data) => {
+            if (err) return;
+
+            if (!data) return;
+
+            res.send("OK");
+        })
+
+        var user = User.findOne({ password: req.body.password });
+
+        if (user) {
+            user.password = await hashPwd(req.body.new_password);
+            user.save();
+        }
+        else {
+            res.send("invalid password");
+        }
+
+
 
     }
     catch (err) {

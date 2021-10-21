@@ -24,6 +24,10 @@ export async function listRecipeV2(req, res) {
       if (category || body.keyword) filter = { ...filter, $or: [] };
       if (category) filter["$or"].push({ category_id: category._id });
       if (body.keyword) filter["$or"].push({ recipe_title: { $regex: body.keyword, $options: "i" } })
+
+      if (body.user_id) {
+        filter["$or"].push({ user_id: body.user_id });
+      }
     }
     else if (body.type == 1) {
       if (body.category) filter.category_id = body.category;
@@ -56,86 +60,82 @@ export async function listRecipeV2(req, res) {
 }
 
 //it's magic time, done yay :D
-export async function listRecipe(req, res) {
-  try {
-    const search = req.body;
+// export async function listRecipe(req, res) {
+//   try {
+//     const search = req.body;
 
-    search.limit === undefined || search.limit === 0
-      ? (search.limit = 0)
-      : search.limit;
-    search.keyword === undefined || search.keyword === null
-      ? (search.keyword = "")
-      : search.keyword;
+//     search.limit === undefined || search.limit === 0
+//       ? (search.limit = 0)
+//       : search.limit;
+//     search.keyword === undefined || search.keyword === null
+//       ? (search.keyword = "")
+//       : search.keyword;
 
-    if (search.keyword != "") {
-      Recipe.find({
-        is_active: true,
-        $or: [
-          { recipe_title: { $regex: search.keyword, $options: "i" } },
-          { category_id: { $regex: search.keyword, $options: "i" } },
-        ],
-      })
-        .populate("category_id")
-        .populate("user_id")
-        .limit(search.limit)
-        .skip(0)
-        .exec(async (err, datas) => {
-          if (err) {
-            console.log("Recipe List Try Error", err.message);
-            return res
-              .status(200)
-              .json({ meta: meta.error.ERROR, message: err.message });
-          }
+//     if (search.keyword != "") {
+//       Recipe.find({
+//         is_active: true,
+//         $or: [
+//           { recipe_title: { $regex: search.keyword, $options: "i" } },
+//           { category_id: { $regex: search.keyword, $options: "i" } },
+//         ],
+//       })
+//         .populate("category_id")
+//         .populate("user_id")
+//         .limit(search.limit)
+//         .skip(0)
+//         .exec(async (err, datas) => {
+//           if (err) {
+//             console.log("Recipe List Try Error", err.message);
+//             return res
+//               .status(200)
+//               .json({ meta: meta.error.ERROR, message: err.message });
+//           }
 
-          datas = await Promise.all(datas.map((p) => p.fillObject()));
-          res.status(200).json({ meta: meta.normal.OK, datas: datas });
-        });
-    } else {
-      Recipe.find({ is_active: true })
-        .populate("category_id")
-        .populate("user_id")
-        .limit(search.limit)
-        .skip(search.skip)
-        .exec(async (err, datas) => {
-          if (err) {
-            console.log("Recipe List Try Error", err.message);
-            return res
-              .status(200)
-              .json({ meta: meta.error.ERROR, message: err.message });
-          }
+//           datas = await Promise.all(datas.map((p) => p.fillObject()));
+//           res.status(200).json({ meta: meta.normal.OK, datas: datas });
+//         });
+//     } else {
+//       Recipe.find({ is_active: true })
+//         .populate("category_id")
+//         .populate("user_id")
+//         .limit(search.limit)
+//         .skip(search.skip)
+//         .exec(async (err, datas) => {
+//           if (err) {
+//             console.log("Recipe List Try Error", err.message);
+//             return res
+//               .status(200)
+//               .json({ meta: meta.error.ERROR, message: err.message });
+//           }
 
-          datas = await Promise.all(datas.map((p) => p.fillObject()));
-          res.status(200).json({ meta: meta.normal.OK, datas: datas });
-        });
-    }
-  } catch (err) {
-    console.log("Recipe List Error", err.message);
-    res
-      .status(500)
-      .json({ meta: meta.internal_error.ERROR, message: err.message });
-  }
-}
+//           datas = await Promise.all(datas.map((p) => p.fillObject()));
+//           res.status(200).json({ meta: meta.normal.OK, datas: datas });
+//         });
+//     }
+//   } catch (err) {
+//     console.log("Recipe List Error", err.message);
+//     res
+//       .status(500)
+//       .json({ meta: meta.internal_error.ERROR, message: err.message });
+//   }
+// }
 
 export function getRecipe(req, res) {
   try {
-    Recipe.findById(req.params.id).exec(async (err, data) => {
-      if (err) {
-        console.log("Recipe Get Try Error", err.message);
-        return res
-          .status(200)
-          .json({ meta: meta.error.ERROR, message: err.message });
-      }
+    Recipe.findById(req.params.id).populate("category_id user_id")
+      .exec(async (err, data) => {
+        if (err) {
+          console.log("Recipe Get Try Error", err.message);
+          return res
+            .status(200)
+            .json({ meta: meta.error.ERROR, message: err.message });
+        }
 
-      if (!data)
-        return res.status(200).json({
-          meta: meta.error.NOTEXIST,
-          message: msg.record.record_notexist,
-        });
+        if (!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
 
-      res
-        .status(200)
-        .json({ meta: meta.normal.OK, data: await data.fillObject() });
-    });
+        res.status(200).json({ meta: meta.normal.OK, data: await data.fillObject() });
+        // res.status(200).json({ meta: meta.normal.OK, data: {} });
+      });
   } catch (err) {
     console.log("Recipe Get Error", err.message);
     res

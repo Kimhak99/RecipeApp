@@ -65,21 +65,20 @@ const RecipeSchema = mongoose.Schema({
         set: v => v || false
     },
 },
-{
-    timestamps: true
-},
-{
-    versionKey: false
-}
+    {
+        timestamps: true
+    },
+    {
+        versionKey: false
+    }
 );
 
 RecipeSchema.methods.fillObject = async function () {
 
     // const result = orders.map(async (p) => {
     //     const users = p.userId.map(async (p) => await userSchema.findById(p)); 
-    var { _id, ...comments } = this.comments;
-    comments = await Promise.all(this.comments.map(p => Comment.findById({ _id: p })));
-
+    var comments = await Promise.all(this.comments.map(p => Comment.findById({ _id: p }).populate("user_id")));
+    comments = await Promise.all(comments.map(async p => await p.fillObject()));
 
     return {
         id: this._id,
@@ -91,14 +90,14 @@ RecipeSchema.methods.fillObject = async function () {
         prep_time: this.prep_time,
         cooking_time: this.cooking_time,
         category_id: await this.category_id.fillObject(),
-        comments: { id: _id, ...comments },
+        comments: comments,
         user_id: await this.user_id.fillObject(),
         num_of_like: this.num_of_like,
         num_of_dislike: this.num_of_dislike,
         is_active: this.is_active
 
-
     }
+
 }
 
 export default mongoose.model("recipe", RecipeSchema);
