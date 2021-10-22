@@ -61,13 +61,13 @@ export async function register(req, res) {
 export async function resetPassword(req, res) {
     try {
         // const tempt = {
-        //     password: "",
+        //     current_password: "",
         //     new_password: "",
         //     // confirm_password: "",
         // }
         // User.findById(id);
 
-        User.findOneAndUpdate({ password: req.body.password }, { password: await hashPwd(req.body.new_password) }).exec((err, data) => {
+        User.findOneAndUpdate({ password: req.body.current_password }, { password: await hashPwd(req.body.new_password) }).exec((err, data) => {
             if (err) return;
 
             if (!data) return;
@@ -75,15 +75,15 @@ export async function resetPassword(req, res) {
             res.send("OK");
         })
 
-        var user = User.findOne({ password: req.body.password });
+        // var user = User.findOne({ password: req.body.password });
 
-        if (user) {
-            user.password = await hashPwd(req.body.new_password);
-            user.save();
-        }
-        else {
-            res.send("invalid password");
-        }
+        // if (user) {
+        //     user.password = await hashPwd(req.body.new_password);
+        //     user.save();
+        // }
+        // else {
+        //     res.send("invalid password");
+        // }
 
 
 
