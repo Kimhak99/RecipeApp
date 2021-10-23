@@ -138,11 +138,9 @@ export function deleteUser(req, res) {
     }
 }
 
-//Make sure you understand what u copy, ok okay ;) wait, why that user name samantha? where did u 
 export async function getUserInfo(req, res) {
     try {
-        res.status(200).json({ user_info: await User.findById(req.user.id) }); //can i change this back?back to what? req.body, incorrect? it's a get method, u cant access body, plus 
-        //u didnt send anything along from frontend 
+        res.status(200).json({ user_info: await User.findById(req.user.id) });
 
     }
     catch (err) {

@@ -7,7 +7,7 @@ import methodOverride from 'method-override';
 
 const app = express();
 const port = process.env.port || 5000;
-
+mongoose.set('useFindAndModify', false);
 mongoose.connect(serverConfig.db_connection, { useNewUrlParser: true, useUnifiedTopology: true }, (err, res) => {
     if (err) throw err;
 

@@ -67,13 +67,18 @@ export async function resetPassword(req, res) {
         // }
         // User.findById(id);
 
-        User.findOneAndUpdate({ password: req.body.current_password }, { password: await hashPwd(req.body.new_password) }).exec((err, data) => {
-            if (err) return;
+        await User.findOneAndUpdate({ password: req.body.current_password}, { password: await hashPwd(req.body.new_password)}, {
+            returnOriginal: false
+          }).exec((err, data) => {
+            if (err) {
+                console.log("Reset Password Try Error ", err.message)
+                return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
+            }
 
-            if (!data) return;
+            if (!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
 
-            res.send("OK");
-        })
+            res.status(200).json({ meta: meta.normal.OK, message: msg.record.record_updated });
+        });
 
         // var user = User.findOne({ password: req.body.password });
 
@@ -85,11 +90,9 @@ export async function resetPassword(req, res) {
         //     res.send("invalid password");
         // }
 
-
-
     }
     catch (err) {
-        console.log("Register Error ", err.message);
+        console.log("Reset Password Error ", err.message);
         res.status(500).json({ meta: meta.internal_error.ERROR, message: err.message });
     }
 }
