@@ -29,8 +29,24 @@ export async function listRecipeV2(req, res) {
         filter["$or"].push({ user_id: body.user_id });
       }
     }
+ 
     else if (body.type == 1) {
       if (body.category) filter.category_id = body.category;
+      if (body.username) filter.user_id = body.username;
+    }
+    else if (body.type == 2) {
+      let category = await Category.findOne({ category_name: { $regex: body.keyword, $options: "i" } });
+      if (category || body.keyword) filter = { ...filter, $or: [] };
+      if (body.username && body.keyword) {
+        filter.user_id = body.username;
+        if (body.keyword){
+         
+          filter["$or"].push({ recipe_title: { $regex: body.keyword, $options: "i" } })}
+        }
+        if (category){
+          filter["$or"].push({ category_id: category._id });
+        }
+        
     }
 
     //need more check

@@ -7,7 +7,7 @@ import { hashPwd, validatePwd } from "../utils/permission";
 
 export async function login(req, res) {
     try {
-        const user = await User.findOne({ username: req.body.username });
+        const user = await User.findOne({ username: req.body.username, is_active: true });
 
         if (user) {
             const checkPwd = await validatePwd(req.body.password, user.password);
@@ -60,25 +60,27 @@ export async function register(req, res) {
 }
 export async function resetPassword(req, res) {
     try {
-        // const tempt = {
-        //     current_password: "",
-        //     new_password: "",
-        //     // confirm_password: "",
-        // }
-        // User.findById(id);
-
-        await User.findOneAndUpdate({ password: req.body.current_password}, { password: await hashPwd(req.body.new_password)}, {
-            returnOriginal: false
-          }).exec((err, data) => {
-            if (err) {
-                console.log("Reset Password Try Error ", err.message)
-                return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
-            }
-
-            if (!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
-
-            res.status(200).json({ meta: meta.normal.OK, message: msg.record.record_updated });
-        });
+        console.log(req);
+        const user = await User.findById(req.user.id)
+        if(!user) {
+            return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
+        }
+        const checkPwd = await validatePwd(req.body.current_password, user.password);
+        if(checkPwd) {
+            await User.findByIdAndUpdate(req.user.id, { password: await hashPwd(req.body.new_password)}, {
+                returnOriginal: false
+              }).exec((err, data) => {
+                if (err) {
+                    console.log("Reset Password Try Error ", err.message)
+                    return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
+                }
+    
+                if (!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
+    
+                res.status(200).json({ meta: meta.normal.OK, message: msg.record.record_updated });
+            });
+        }
+        
 
         // var user = User.findOne({ password: req.body.password });
 

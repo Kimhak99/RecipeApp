@@ -79,7 +79,7 @@ export function getUser(req, res) {
 
 export async function addUser(req, res) {
     try {
-        const fullname = req.body.lastname + " " + req.body.firstname;
+        // const fullname = req.body.lastname + " " + req.body.firstname;
         if (!req.body) return res.status(200).json({ meta: meta.error.MISSING, message: msg.missing_data.user });
         const { password, ...temp } = req.body;
         const user = new User({ ...temp, password: await hashPwd(password) });
