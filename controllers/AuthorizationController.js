@@ -60,7 +60,6 @@ export async function register(req, res) {
 }
 export async function resetPassword(req, res) {
     try {
-        console.log(req);
         const user = await User.findById(req.user.id)
         if(!user) {
             return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
@@ -95,6 +94,36 @@ export async function resetPassword(req, res) {
     }
     catch (err) {
         console.log("Reset Password Error ", err.message);
+        res.status(500).json({ meta: meta.internal_error.ERROR, message: err.message });
+    }
+}
+
+export async function forgetPassword(req, res) {
+    try {
+       
+        var user = await User.findOne({ email: req.body.email });
+
+        if(!user) {
+            return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
+        }
+
+        await User.findByIdAndUpdate(user.id, { password: await hashPwd(req.body.new_password)}, {
+            returnOriginal: false
+          }).exec((err, data) => {
+            if (err) {
+                console.log("Forget Password Try Error ", err.message)
+                return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
+            }
+
+            if (!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
+
+            res.status(200).json({ meta: meta.normal.OK, message: msg.record.record_updated });
+        });
+     
+        
+    }
+    catch (err) {
+        console.log("Forget Password Error ", err.message);
         res.status(500).json({ meta: meta.internal_error.ERROR, message: err.message });
     }
 }
