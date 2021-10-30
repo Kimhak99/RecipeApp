@@ -94,7 +94,9 @@ RecipeSchema.methods.fillObject = async function () {
         user_id: await this.user_id.fillObject(),
         num_of_like: this.num_of_like,
         num_of_dislike: this.num_of_dislike,
-        is_active: this.is_active
+        is_active: this.is_active,
+        createdAt: this.createdAt,
+        updatedAt: this.updatedAt
 
     }
 
