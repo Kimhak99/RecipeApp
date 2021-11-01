@@ -61,25 +61,25 @@ export async function register(req, res) {
 export async function resetPassword(req, res) {
     try {
         const user = await User.findById(req.user.id)
-        if(!user) {
+        if (!user) {
             return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
         }
         const checkPwd = await validatePwd(req.body.current_password, user.password);
-        if(checkPwd) {
-            await User.findByIdAndUpdate(req.user.id, { password: await hashPwd(req.body.new_password)}, {
+        if (checkPwd) {
+            await User.findByIdAndUpdate(req.user.id, { password: await hashPwd(req.body.new_password) }, {
                 returnOriginal: false
-              }).exec((err, data) => {
+            }).exec((err, data) => {
                 if (err) {
                     console.log("Reset Password Try Error ", err.message)
                     return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
                 }
-    
+
                 if (!data) return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
-    
+
                 res.status(200).json({ meta: meta.normal.OK, message: msg.record.record_updated });
             });
         }
-        
+
 
         // var user = User.findOne({ password: req.body.password });
 
@@ -100,16 +100,15 @@ export async function resetPassword(req, res) {
 
 export async function forgetPassword(req, res) {
     try {
-       
+
         var user = await User.findOne({ email: req.body.email });
 
-        if(!user) {
+        if (!user) {
             return res.status(200).json({ meta: meta.error.NOTEXIST, message: msg.record.record_notexist });
         }
-
-        await User.findByIdAndUpdate(user.id, { password: await hashPwd(req.body.new_password)}, {
+        await User.findByIdAndUpdate(user.id, { password: await hashPwd(req.body.new_password) }, {
             returnOriginal: false
-          }).exec((err, data) => {
+        }).exec((err, data) => {
             if (err) {
                 console.log("Forget Password Try Error ", err.message)
                 return res.status(200).json({ meta: meta.error.ERROR, message: err.message });
@@ -119,8 +118,8 @@ export async function forgetPassword(req, res) {
 
             res.status(200).json({ meta: meta.normal.OK, message: msg.record.record_updated });
         });
-     
-        
+
+
     }
     catch (err) {
         console.log("Forget Password Error ", err.message);
