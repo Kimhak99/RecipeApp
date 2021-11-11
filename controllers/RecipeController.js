@@ -29,7 +29,7 @@ export async function listRecipeV2(req, res) {
         filter["$or"].push({ user_id: body.user_id });
       }
     }
- 
+
     else if (body.type == 1) {
       if (body.category) filter.category_id = body.category;
       if (body.username) filter.user_id = body.username;
@@ -39,20 +39,19 @@ export async function listRecipeV2(req, res) {
       if (category || body.keyword) filter = { ...filter, $or: [] };
       if (body.username && body.keyword) {
         filter.user_id = body.username;
-        if (body.keyword){
-         
-          filter["$or"].push({ recipe_title: { $regex: body.keyword, $options: "i" } })}
+        if (body.keyword) {
+
+          filter["$or"].push({ recipe_title: { $regex: body.keyword, $options: "i" } })
         }
-        if (category){
-          filter["$or"].push({ category_id: category._id });
-        }
-        
+      }
+      if (category) {
+        filter["$or"].push({ category_id: category._id });
+      }
+
     }
 
-    //need more check
     // if(body.user) filter.recipe_title = { $regex: body.keyword, $options: "i" };
-
-    recipes = await Recipe.find(filter)
+    recipes = await Recipe.find(filter).sort({ createdAt: -1 })
       .limit(body.limit)
       .skip(0)
       .populate("category_id user_id");
