@@ -61,10 +61,9 @@ export async function listRecipeV2(req, res) {
         .status(500)
         .send({ meta: 500, message: "internal server error" });
 
-    recipes = await Promise.all(recipes.map((item) => item.fillObject()));
+    recipes = await Promise.all(recipes.map((item, key) => item.fillObject(key)));
 
-    //part of it is my bad. xd. i didnt use the meta thing, i used 200 directly, while
-    // u check for 2001 lol... well, my bad...
+
     res.status(200).send({ meta: meta.normal.OK, datas: recipes });
   } catch (err) {
     console.log("Recipe List Error", err.message);
