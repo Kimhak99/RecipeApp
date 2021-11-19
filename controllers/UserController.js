@@ -10,7 +10,6 @@ export function listUser(req, res) {
         search.limit === undefined || search.limit === 0 ? search.limit = 0 : search.limit;
         search.keyword === undefined || search.keyword === null ? search.keyword = "" : search.keyword;
 
-        // lim teachhay, so split the string by checking middle space
         const name = search.keyword.split(" ");
 
         if (search.keyword != "") {

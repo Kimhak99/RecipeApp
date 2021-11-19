@@ -14,7 +14,7 @@ export async function listRecipeV2(req, res) {
     * 2. assign result to filter.category_id with id field from result
     * 3. prevent null or if error happened return from category.find()//
     * cate = Category.find()
-    * if(!cat) return  res.status yes...
+    * if(!cat) return  res.status 
     */
 
     //type 0 - search bar, type 1 category list
@@ -73,7 +73,7 @@ export async function listRecipeV2(req, res) {
   }
 }
 
-//it's magic time, done yay :D
+
 // export async function listRecipe(req, res) {
 //   try {
 //     const search = req.body;
