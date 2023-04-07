@@ -3,7 +3,7 @@ export const general = {
 }
 
 export const normal = {
-    OK : 2001
+    OK: 2001
 }
 
 export const error = {

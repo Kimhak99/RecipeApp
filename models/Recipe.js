@@ -25,14 +25,14 @@ const RecipeSchema = mongoose.Schema({
         set: v => v || ""
     },
     prep_time: {
-        type: String,
-        default: "",
-        set: v => v || ""
+        type: Number,
+        default: 0,
+        set: v => v || 0
     },
     cooking_time: {
-        type: String,
-        default: "",
-        set: v => v || ""
+        type: Number,
+        default: 0,
+        set: v => v || 0
     },
     category_id: {
         type: mongoose.Types.ObjectId,
@@ -65,21 +65,21 @@ const RecipeSchema = mongoose.Schema({
         set: v => v || false
     },
 },
-{
-    timestamps: true
-},
-{
-    versionKey: false
-}
+    {
+        timestamps: true
+    },
+    {
+        versionKey: false
+    }
 );
 
-RecipeSchema.methods.fillObject = async function () {
+RecipeSchema.methods.fillObject = async function (index) {
 
     // const result = orders.map(async (p) => {
     //     const users = p.userId.map(async (p) => await userSchema.findById(p)); 
-    var { _id, ...comments } = this.comments;
-    comments = await Promise.all(this.comments.map(p => Comment.findById({ _id: p })));
 
+    var comments = await Promise.all(this.comments.map(p => Comment.findById({ _id: p }).populate("user_id")));
+    comments = await Promise.all(comments.map(async p => (p ? await p.fillObject() : null)));
 
     return {
         id: this._id,
@@ -90,15 +90,17 @@ RecipeSchema.methods.fillObject = async function () {
         description: this.description,
         prep_time: this.prep_time,
         cooking_time: this.cooking_time,
-        category_id: await this.category_id.fillObject(),
-        comments: { id: _id, ...comments },
-        user_id: await this.user_id.fillObject(),
+        category_id: this.category_id ? await this.category_id.fillObject() : null,
+        comments: comments,
+        user_id: this.user_id ? await this.user_id.fillObject() : null,
         num_of_like: this.num_of_like,
         num_of_dislike: this.num_of_dislike,
-        is_active: this.is_active
-
+        is_active: this.is_active,
+        createdAt: this.createdAt,
+        updatedAt: this.updatedAt
 
     }
+
 }
 
 export default mongoose.model("recipe", RecipeSchema);

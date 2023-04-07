@@ -16,18 +16,18 @@ const CommentSchema = mongoose.Schema({
         set: v => v || false
     }
 },
-{
-    timestamps : true
-},
-{
-    versionKey: false
-}
+    {
+        timestamps: true
+    },
+    {
+        versionKey: false
+    }
 );
 
 CommentSchema.methods.fillObject = async function () {
     return {
         id: this._id,
-        user_id: await this.user_id.fillObject(),
+        user_id: this.user_id ? await this.user_id.fillObject() : null,
         description: this.description,
         is_active: this.is_active
     }
