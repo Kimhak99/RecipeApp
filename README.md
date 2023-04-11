@@ -1,7 +1,5 @@
 # RecipeApp
-This is the backend of the recipe app
-
-Please run this file before running the the front-end one.
+This is the backend of the recipe app. Please run this file before running the the front-end one.
 
 Installing and running:
 
